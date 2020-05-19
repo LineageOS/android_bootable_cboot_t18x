@@ -442,14 +442,16 @@ static int add_profiler_carveout(char *cmdline, int len,
 	return ret;
 }
 
-#if defined(CONFIG_ENABLE_NVDEC)
 static int tegrabl_linuxboot_add_nvdec_enabled_info(char *cmdline, int len,
 	char *param, void *priv)
 {
 	TEGRABL_UNUSED(priv);
+#if defined(CONFIG_ENABLE_NVDEC)
 	return tegrabl_snprintf(cmdline, len, "%s=1 ", param);
-}
+#else
+	return tegrabl_snprintf(cmdline, len, "%s=0 ", param);
 #endif
+}
 
 #if defined(CONFIG_ENABLE_VERIFIED_BOOT)
 static const char *cmdline_vb_boot_state;
@@ -528,9 +530,7 @@ static struct tegrabl_linuxboot_param extra_params[] = {
 	{ "vpr_resize", tegrabl_linuxboot_add_vprresize_info, NULL },
 	{ "bl_prof_dataptr", add_profiler_carveout, NULL},
 	{ "sdhci_tegra.en_boot_part_access", tegrabl_linuxboot_add_string, "1" },
-#if defined(CONFIG_ENABLE_NVDEC)
 	{ "nvdec_enabled", tegrabl_linuxboot_add_nvdec_enabled_info, NULL },
-#endif
 	{ NULL, NULL, NULL},
 };
 
