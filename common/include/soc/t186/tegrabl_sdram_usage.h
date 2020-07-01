@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2019, NVIDIA CORPORATION.  All rights reserved.
  *
  * NVIDIA CORPORATION and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -93,6 +93,8 @@
 
 #define MAX_KERNEL_IMAGE_SIZE	0x14000000
 #define RAMDISK_ADDRESS			0x9C000000
+#define RAMDISK_SIZE			0x0C000000
+#define BOOT_IMAGE_MAX_SIZE		0x04000000
 #define BOOT_IMAGE_LOAD_ADDRESS	0xA8000000
 #define NCT_PART_SIZE			0x00200000
 #define NCT_PART_LOAD_ADDRESS	0x95E00000

@@ -40,11 +40,12 @@ uint32_t tegrabl_odmdata_get(void);
  * @brief set odmdata on br-bct
  *
  * @param val Value to write to odmdata
+ * @param is_storage_flush flag to flush the data to storage
  *
  * @return TEGREABL_NO_ERROR in case of success and
  * TEGRABL_ERR_INVALID if br-bct is not initialized
  */
-tegrabl_error_t tegrabl_odmdata_set(uint32_t val);
+tegrabl_error_t tegrabl_odmdata_set(uint32_t val, bool is_storage_flush);
 
 /*
  * @brief get the odmdata_params structure and its size

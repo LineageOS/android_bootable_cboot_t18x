@@ -25,9 +25,8 @@
 #include <tegrabl_sdram_usage.h>
 #include <tegrabl_soc_misc.h>
 #include <tegrabl_bootimg.h>
-#include <tegrabl_auth.h>
-#include <tegrabl_exit.h>
 #include <tegrabl_linuxboot_helper.h>
+#include <tegrabl_exit.h>
 
 #ifdef CONFIG_ENABLE_A_B_SLOT
 #include <tegrabl_a_b_boot_control.h>
@@ -36,10 +35,11 @@
 /* boot.img signature size for verify_boot */
 #define BOOT_IMG_SIG_SIZE (4 * 1024)
 
-static char *tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
+tegrabl_error_t tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 						tegrabl_binary_copy_t binary_copy,
 						char *partition_name)
 {
+	tegrabl_error_t err = TEGRABL_NO_ERROR;
 	static char partition_names[TEGRABL_BINARY_MAX]
 								[TEGRABL_GPT_MAX_PARTITION_NAME + 1] = {
 		[TEGRABL_BINARY_KERNEL] = {"kernel"},
@@ -51,6 +51,10 @@ static char *tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 
 	TEGRABL_ASSERT(strlen(partition_names[bin_type]) <=
 				(TEGRABL_GPT_MAX_PARTITION_NAME - 2));
+	if (strlen(partition_names[bin_type]) == 0) {
+		err = TEGRABL_ERR_NOT_FOUND;
+		goto exit;
+	}
 
 	strcpy(partition_name, partition_names[bin_type]);
 
@@ -67,7 +71,8 @@ static char *tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 	}
 
 #endif
-	return partition_name;
+exit:
+	return err;
 }
 
 #if defined(CONFIG_ENABLE_A_B_SLOT)
@@ -346,11 +351,6 @@ tegrabl_error_t tegrabl_load_binary_bdev(tegrabl_binary_type_t bin_type, void **
 		*binary_length = partition_size;
 	}
 
-	/* Handle validation of the binaries */
-#if defined(CONFIG_OS_IS_L4T)
-	err = tegrabl_auth_payload(bin_type, binary.partition_name,
-			(void*)binary.load_address, (uint32_t)partition_size);
-#endif
 done:
 	return err;
 }
@@ -445,11 +445,6 @@ tegrabl_error_t tegrabl_load_binary_copy(
 		*binary_length = partition_size;
 	}
 
-	/* Handle validation of the binaries */
-#if defined(CONFIG_OS_IS_L4T)
-	err = tegrabl_auth_payload(bin_type, binary.partition_name,
-			(void*)binary.load_address, (uint32_t)partition_size);
-#endif
 done:
 	return err;
 }

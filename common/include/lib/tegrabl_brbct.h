@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <tegrabl_error.h>
 #include <tegrabl_partition_manager.h>
+#include <tegrabl_global_data.h>
 
 #define BR_BCT_MAX_COPIES 64U
 #define BR_BLOCK_SIZE (16 * 1024)
@@ -120,7 +121,7 @@ tegrabl_error_t tegrabl_brbct_verify_customerdata(uintptr_t bctptr);
  *
  * @return Offset of active marker structure in br-bct.
  */
-uint32_t tegrabl_brbct_active_marker_offset(void);
+struct active_marker_info* tegrabl_brbct_get_active_marker_data(void);
 
 /**
  * @brief Copy current brbct's customer data to new bct

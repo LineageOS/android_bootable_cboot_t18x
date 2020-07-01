@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2019, NVIDIA CORPORATION.  All rights reserved.
  *
  * NVIDIA CORPORATION and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -51,6 +51,7 @@ typedef uint32_t fuse_type_t;
 #define FUSE_SOC_SPEEDO2 0xbU
 #define FUSE_ENABLED_CPU_CORES 0xcU
 #define FUSE_APB2JTAG_DISABLE 0xdU
+#define FUSE_PRIVATE1 FUSE_APB2JTAG_DISABLE
 #define FUSE_TPC_DISABLE 0xeU
 #define FUSE_APB2JTAG_LOCK 0xfU
 #define FUSE_SOC_IDDQ 0x10U
@@ -97,6 +98,7 @@ typedef uint32_t fuse_type_t;
 #define FUSE_SKIP_DEV_SEL_STRAPS 0x2eU
 #define FUSE_BOOT_DEVICE_INFO 0x2fU
 #define FUSE_SECURE_PROVISION_INFO 0x30U
+#define FUSE_PRIVATE2 FUSE_SECURE_PROVISION_INFO
 #define FUSE_KEK0 0x31U
 #define FUSE_KEK1 0x32U
 #define FUSE_ENDORSEMENT_KEY 0x33U
