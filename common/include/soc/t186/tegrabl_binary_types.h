@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA Corporation.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software and related documentation
@@ -15,45 +15,49 @@
  * @brief Defines various binaries which can be
  * loaded via loader.
  */
-enum tegrabl_binary_type {
-	TEGRABL_BINARY_MB1_BCT = 0,			/* 0x0  MB1-BCT */
-	TEGRABL_BINARY_MTS_PREBOOT = 1,		/* 0x1  Preboot MTS binary */
-	TEGRABL_BINARY_DMCE = 2,			/* 0x2  MTS DMCE binary */
-	TEGRABL_BINARY_MTS = 3,				/* 0x3  MTS binary */
-	TEGRABL_BINARY_EARLY_SPEFW = 4,		/* 0x4  SPE firmware */
-	TEGRABL_BINARY_DRAM_ECC = 5,		/* 0x5  DRAM ECC */
-	TEGRABL_BINARY_BLACKLIST_INFO = 6,	/* 0x6  Blacklist Info */
-	TEGRABL_BINARY_EXTENDED_CAN = 7,	/* 0x7  TSEC firware */
-	TEGRABL_BINARY_MB2 = 8,				/* 0x8  MB2 binary */
-	TEGRABL_BINARY_FUSEBYPASS = 9,		/* 0x9  Fuse bypass */
-	TEGRABL_BINARY_SC7_RESUME_FW = 10,	/* 0xA  SC7 resume fw
+/* macro tegrabl binary type */
+typedef uint32_t tegrabl_binary_type_t;
+#define TEGRABL_BINARY_MB1_BCT 0U			/* 0x0  MB1-BCT */
+#define TEGRABL_BINARY_MTS_PREBOOT 1U		/* 0x1  Preboot MTS binary */
+#define TEGRABL_BINARY_DMCE 2U			/* 0x2  MTS DMCE binary */
+#define TEGRABL_BINARY_MTS 3U				/* 0x3  MTS binary */
+#define TEGRABL_BINARY_EARLY_SPEFW 4U		/* 0x4  SPE firmware */
+#define TEGRABL_BINARY_DRAM_ECC 5U		/* 0x5  DRAM ECC */
+#define TEGRABL_BINARY_BLACKLIST_INFO 6U	/* 0x6  Blacklist Info */
+#define TEGRABL_BINARY_EXTENDED_CAN 7U	/* 0x7  TSEC firware */
+#define TEGRABL_BINARY_MB2 8U				/* 0x8  MB2 binary */
+#define TEGRABL_BINARY_FUSEBYPASS 9U		/* 0x9  Fuse bypass */
+#define TEGRABL_BINARY_SC7_RESUME_FW 10U	/* 0xA  SC7 resume fw
 												(warmboot binary) */
-	TEGRABL_BINARY_APE = 11,			/* 0xB  APE binary */
-	TEGRABL_BINARY_SCE = 12,			/* 0xC  SCE binary */
-	TEGRABL_BINARY_CPU_BL = 13,			/* 0xD  Tboot-CPU / CPU bootloader */
-	TEGRABL_BINARY_TOS = 14,			/* 0xE  TLK image */
-	TEGRABL_BINARY_EKS = 15,			/* 0xF  EKS image */
-	TEGRABL_BPMP_FW = 16,				/* 0x10 BPMP Firmware */
-	TEGRABL_BPMP_FW_DTB = 17,			/* 0x11 BPMP Firmware DTB */
-	TEGRABL_BINARY_BR_BCT = 18,			/* 0x12 Bootrom BCT */
-	TEGRABL_BINARY_SMD = 19,			/* 0x13 Slot Meta Data for A/B slots
+#define TEGRABL_BINARY_APE 11U			/* 0xB  APE binary */
+#define TEGRABL_BINARY_SCE 12U			/* 0xC  SCE binary */
+#define TEGRABL_BINARY_CPU_BL 13U			/* 0xD  Tboot-CPU / CPU bootloader */
+#define TEGRABL_BINARY_TOS 14U			/* 0xE  TLK image */
+#define TEGRABL_BINARY_EKS 15U			/* 0xF  EKS image */
+#define TEGRABL_BINARY_BPMP_FW 16U				/* 0x10 BPMP Firmware */
+#define TEGRABL_BINARY_BPMP_FW_DTB 17U			/* 0x11 BPMP Firmware DTB */
+#define TEGRABL_BINARY_BR_BCT 18U			/* 0x12 Bootrom BCT */
+#define TEGRABL_BINARY_SMD 19U			/* 0x13 Slot Meta Data for A/B slots
 												status */
-	TEGRABL_BINARY_BL_DTB = 20,			/* 0x14 Bootloader DTB */
-	TEGRABL_BINARY_KERNEL_DTB = 21,		/* 0x15 Kernel DTB */
-	TEGRABL_BINARY_RPB = 22,			/* 0x16 Rollback Prevention Bypass
+#define TEGRABL_BINARY_BL_DTB 20U			/* 0x14 Bootloader DTB */
+#define TEGRABL_BINARY_KERNEL_DTB 21U		/* 0x15 Kernel DTB */
+#define TEGRABL_BINARY_RPB 22U			/* 0x16 Rollback Prevention Bypass
 												token */
-	TEGRABL_BINARY_MB2_RAMDUMP = 23,	/* 0x17  MB2 binary for ramdump */
-	TEGRABL_BINARY_MAX = 24				/* 0x18 */
-};
+#define TEGRABL_BINARY_MB2_RAMDUMP 23U	/* 0x17  MB2 binary for ramdump */
+#define TEGRABL_BINARY_KERNEL 24U		/* 0x18 */
+#define TEGRABL_BINARY_RECOVERY_KERNEL 25U	/* 0x19 */
+#define TEGRABL_BINARY_NCT 26U		/* 0x1a */
+#define TEGRABL_BINARY_KERNEL_DTBO 27U	/* 0x1b */
+#define TEGRABL_BINARY_MAX 28U				/* 0x1c */
 
 /**
  * @brief Binary identifier to indicate which copy of the binary needs
  * to be loaded
  */
-enum tegrabl_binary_copy {
-	TEGRABL_BINARY_COPY_PRIMARY,
-	TEGRABL_BINARY_COPY_RECOVERY,
-	TEGRABL_BINARY_COPY_MAX
-};
+/* macro tegrabl binary copy */
+typedef uint32_t tegrabl_binary_copy_t;
+#define TEGRABL_BINARY_COPY_PRIMARY 0U
+#define TEGRABL_BINARY_COPY_RECOVERY 1U
+#define TEGRABL_BINARY_COPY_MAX 2U
 
 #endif

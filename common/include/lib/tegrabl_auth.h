@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All Rights Reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -26,7 +26,7 @@
  */
 struct tegrabl_auth_header_info {
 	/* Mode of authentication */
-	enum tegrabl_signingtype mode;
+	tegrabl_signingtype_t mode;
 	/* Size which needs to be validated */
 	uint32_t validation_size;
 	/* Total size validated */
@@ -37,6 +37,11 @@ struct tegrabl_auth_header_info {
 	struct tegrabl_crypto_aes_context aes_context;
 	/* RSA context for se sha and rsa operations */
 	struct tegrabl_crypto_rsa_pss_context rsa_pss_context;
+
+#if defined(CONFIG_ENABLE_ECDSA)
+	/* Ecdsa context for se sha and ecdsa operations */
+	struct tegrabl_crypto_ecdsa_context ecdsa_context;
+#endif
 };
 
 /**
@@ -197,6 +202,13 @@ tegrabl_error_t tegrabl_verify_cmachash(void *buffer,
  */
 tegrabl_error_t tegrabl_cipher_binary(void *buffer,
 	uint32_t buffer_size, void *output_buffer, bool is_decrypt);
+
+
+#if defined(CONFIG_OS_IS_L4T)
+#include <tegrabl_binary_types.h>
+tegrabl_error_t tegrabl_auth_payload(tegrabl_binary_type_t bin_type,
+			char *name, void *payload, uint32_t max_size);
+#endif
 
 #endif /* TEGRABL_AUTH_H */
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 - 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2018, NVIDIA CORPORATION.  All rights reserved.
  *
  * NVIDIA CORPORATION and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -41,10 +41,10 @@
  * 0xA8000000  |__________________________________________________|
  *             |                                                  |
  *             |                                                  |
- *             |                   Ramdisk                        | <- 176 MB
- * 0x9D000000->|__________________________________________________|
+ *             |                   Ramdisk                        | <- 224 MB
+ * 0x9C000000->|__________________________________________________|
  *             |                                                  |
- *             |                   NvTboot-CPU                    |  <- 112 MB
+ *             |                   NvTboot-CPU                    |  <- 64 MB
  * 0x96000000->|__________________________________________________|
  *             |                                                  |
  *             |                   NCT partition                  |  <- 2  MB
@@ -91,7 +91,8 @@
 
 #define TLK_PARAMS_BUFFER		0x8F000000
 
-#define RAMDISK_ADDRESS			0x9D000000
+#define MAX_KERNEL_IMAGE_SIZE	0x14000000
+#define RAMDISK_ADDRESS			0x9C000000
 #define BOOT_IMAGE_LOAD_ADDRESS	0xA8000000
 #define NCT_PART_SIZE			0x00200000
 #define NCT_PART_LOAD_ADDRESS	0x95E00000
@@ -100,13 +101,14 @@
 #define EKS_IMAGE_LOAD_ADDRESS	0x92400000
 #define TOS_IMAGE_LOAD_ADDRESS	0x92100000
 #define DTB_LOAD_ADDRESS		0x92000000
+#define DTB_MAX_SIZE			0x00100000
 #define LINUX_LOAD_ADDRESS		0x80080000
 #define TBOOT_ENTRY_ADDRESS		0x90000000
 
-#define EKS_MAXIMUM_CODE_SIZE	(20 * 1024)
+#define MAX_EKS_SIZE			(1U * 1024U * 1024U)
 
 /* bootloader-dtb */
-#define BL_DTB_SIZE             (1024 * 1024)
-#define BL_DTB_ALIGNMENT        (512)
+#define BL_DTB_SIZE			(1024U * 1024U)
+#define BL_DTB_ALIGNMENT		(512U)
 
 #endif

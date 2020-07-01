@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2015-2017, NVIDIA Corporation.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -58,8 +58,8 @@ extern uint32_t g_pllrefdiv;
  * Also need to use the full value in Hz in the macro
  */
 
-#define TEGRABL_CLK_MIN_RANGE(F) ((F - (F>>5) - (1<<15) + 1) >> 15)
-#define TEGRABL_CLK_MAX_RANGE(F) ((F + (F>>5) + (1<<15) - 1) >> 15)
+#define TEGRABL_CLK_MIN_RANGE(F) (((F) - ((F)>>5) - (1<<15) + 1) >> 15)
+#define TEGRABL_CLK_MAX_RANGE(F) (((F) + ((F)>>5) + (1<<15) - 1) >> 15)
 
 /* For an easier ECO (keeping same number of instructions), we need a
  * special case for 12 min range
@@ -114,7 +114,7 @@ tegrabl_error_t tegrabl_init_plle(void);
 tegrabl_error_t tegrabl_init_utmipll(void);
 
 tegrabl_error_t tegrabl_clk_start_pll(
-		enum tegrabl_clk_pll_id pll_id,
+		tegrabl_clk_pll_id_t pll_id,
 		uint32_t m,
 		uint32_t n,
 		uint32_t p,
@@ -124,8 +124,8 @@ tegrabl_error_t tegrabl_clk_start_pll(
 
 tegrabl_error_t tegrabl_sata_pll_cfg(void);
 
-uint32_t tegrabl_get_pll_freq_khz(enum tegrabl_clk_pll_id pll_id);
+uint32_t tegrabl_get_pll_freq_khz(tegrabl_clk_pll_id_t pll_id);
 
-bool check_clk_src_enable(enum tegrabl_clk_src_id_t clk_src);
+bool check_clk_src_enable(tegrabl_clk_src_id_t clk_src);
 
 #endif /* INCLUDE_TEGRABL_CLK_RST_SOC_H */

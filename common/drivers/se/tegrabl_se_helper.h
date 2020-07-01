@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, NVIDIA CORPORATION.  All Rights Reserved.
+ * Copyright (c) 2015-2017, NVIDIA CORPORATION.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -15,6 +15,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <tegrabl_error.h>
+
+#define TEGRABL_BIGINT_LT -1
+#define TEGRABL_BIGINT_EQ 0
+#define TEGRABL_BIGINT_GT 1
+#define TEGRABL_BIGINT_ZERO 0
+#define TEGRABL_BIGINT_NONZERO 1
+#define TEGRABL_BIGINT_INPUT_ERROR -2
 
 /*
  * @brief swap bytes in given two indexes of a buffer
@@ -78,6 +85,12 @@ tegrabl_error_t tegrabl_se_left_shift_one_bit(
  * @return swapped 32-bit value
  */
 uint32_t tegrabl_se_swap_bytes(const uint32_t value);
+
+bool
+tegrabl_se_cmp_bigunsignedint_is_zero(uint8_t *value, uint32_t value_size);
+
+int32_t
+tegrabl_se_cmp_bigunsignedint(uint8_t *value1, uint8_t *value2, uint32_t size);
 
 #endif
 

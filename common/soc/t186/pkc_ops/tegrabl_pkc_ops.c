@@ -23,13 +23,13 @@ tegrabl_error_t tegrabl_pkc_modulus_get(uint8_t *modulus)
 	uintptr_t brbct_address;
 
 	if (!modulus) {
-		pr_error("brbct address is NULL!\n");
+		pr_trace("brbct address is NULL!\n");
 		return TEGRABL_ERROR(TEGRABL_ERR_BAD_PARAMETER, 0);
 	}
 
 	brbct_address = tegrabl_brbct_get();
 	if (brbct_address == 0) {
-		pr_error("brbct is not initialised!\n");
+		pr_trace("brbct is not initialised!\n");
 		return TEGRABL_ERROR(TEGRABL_ERR_NOT_INITIALIZED, 0);
 	}
 

@@ -14,8 +14,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <tegrabl_error.h>
+#include <tegrabl_partition_manager.h>
 
-#define BR_BCT_MAX_COPIES 64
+#define BR_BCT_MAX_COPIES 64U
 #define BR_BLOCK_SIZE (16 * 1024)
 
 /* TODO: Converge mb1-bct and br-bct libraries into a single library */
@@ -66,10 +67,8 @@ uintptr_t tegrabl_brbct_pubkey_rsa_get(void);
 /**
  * @brief Write multiple copies of BR-BCT to storage
  *
- * @param writer Handle of function which writes to destination.
  * @param buffer Input buffer.
- * @param aux_info Auxiliary information passed to writer and seeker functions
- * registered in init.
+ * @param partition handle to br-bct partition.
  * @param part_size Size of the BR-BCT partition
  * @param bct_size Size of the BR-BCT buffer
  * @param chunk_size Maximum transfer chunk size
@@ -77,8 +76,7 @@ uintptr_t tegrabl_brbct_pubkey_rsa_get(void);
  * @return TEGRABL_NO_ERROR if successful else appropriate error code.
  */
 tegrabl_error_t tegrabl_brbct_write_multiple(
-	tegrabl_error_t (*writer)(const void *buffer, uint64_t size,
-	void *aux_info), void *buffer, void *aux_info, uint64_t part_size,
+	void *buffer, struct tegrabl_partition *partition, uint64_t part_size,
 	uint64_t bct_size, uint32_t chunk_size);
 
 /**

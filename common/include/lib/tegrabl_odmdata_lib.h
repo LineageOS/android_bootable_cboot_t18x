@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2015-2017, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -65,5 +65,14 @@ tegrabl_error_t tegrabl_odmdata_params_get(
  * @return true if unlocked, and false if locked
  */
 bool tegrabl_odmdata_is_device_unlocked(void);
+
+/*
+ * @brief get odm config by config name string
+ *
+ * @param name odmdata config name string
+ *
+ * @return true if config is set, false if not
+ */
+bool tegrabl_odmdata_get_config_by_name(char *name);
 
 #endif /* INCLUDED_TEGRABL_ODMDATA_LIB_H */

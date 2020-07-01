@@ -19,8 +19,8 @@
  * rollback check logic as mb1
  */
 
-#ifndef __ROLLBACK_PREVENTION_H
-#define __ROLLBACK_PREVENTION_H
+#ifndef TEGRABL_PREVENT_ROLLBACK_H
+#define TEGRABL_PREVENT_ROLLBACK_H
 
 #include <tegrabl_error.h>
 #include <tegrabl_rollback_prevention.h>
@@ -86,7 +86,7 @@ tegrabl_error_t tegrabl_update_rollback_fuse(uint32_t fuse_value);
  *
  * @return TEGRABL_NO_ERROR if no rollback attempt, else invalid error code */
 tegrabl_error_t tegrabl_check_binary_rollback(uint32_t bin_type,
-											  uint8_t rollback_level);
+											  uint16_t rollback_level);
 
 /*
  * @brief Do rollback prevention logic with given rollback data
@@ -94,4 +94,4 @@ tegrabl_error_t tegrabl_check_binary_rollback(uint32_t bin_type,
  * @return TEGRABL_NO_ERROR if succeed */
 tegrabl_error_t tegrabl_prevent_rollback(void);
 
-#endif /* ROLLBACK_PREVENTION_H */
+#endif /* TEGRABL_PREVENT_ROLLBACK_H */

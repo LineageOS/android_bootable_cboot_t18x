@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -16,11 +16,9 @@
 #include <tegrabl_arm64_smccc.h>
 
 /* MCE command enums for SMC calls */
-enum {
-	MCE_SMC_ROC_FLUSH_CACHE = 0x82FFFF0B,
-	MCE_SMC_ROC_FLUSH_CACHE_ONLY = 0x82FFFF0E,
-	MCE_SMC_ROC_CLEAN_CACHE_ONLY = 0x82FFFF0F,
-};
+#define MCE_SMC_ROC_FLUSH_CACHE 0x82FFFF0B
+#define MCE_SMC_ROC_FLUSH_CACHE_ONLY 0x82FFFF0E
+#define MCE_SMC_ROC_CLEAN_CACHE_ONLY 0x82FFFF0F
 
 /**
  * @brief Perform ROC-based flush of all caches

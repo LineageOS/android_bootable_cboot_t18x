@@ -39,9 +39,10 @@
  *     0xB00000|__________________________________________________|
  */
 
-#define TEGRABL_CARVEOUT_PAGE_SIZE                 (64 * 1024)
-#define TEGRABL_CARVEOUT_RAMOOPS_SIZE              (2 * 1024 * 1024)
-#define TEGRABL_CARVEOUT_GAMEDATA_SIZE             (1 * 1024 * 1024)
+#define TEGRABL_CARVEOUT_PAGE_SIZE                 (64U * 1024U)
+#define TEGRABL_CARVEOUT_RAMOOPS_SIZE              (2U * 1024U * 1024U)
+#define TEGRABL_SYSCFG_SIZE                        (2U * 1024U * 1024U)
+#define TEGRABL_CARVEOUT_GAMEDATA_SIZE             (1U * 1024U * 1024U)
 
 #define TEGRABL_TOS_PARAMS_OFFSET					0U
 #define TEGRABL_CARVEOUT_MB2_HEAP_RSVD1_OFFSET		(TEGRABL_TOS_PARAMS_OFFSET + TEGRABL_CARVEOUT_PAGE_SIZE)
@@ -86,14 +87,28 @@
  *     0x80000 |__________________________________________________|
  *             |                                                  |
  *             |                                                  |
- *             |                    Ramops                        |  <- 2 MB
  *             |                                                  |
- *    0x280000 |__________________________________________________|
+ *             |                  Ramoops                         |  <- 2MB
+ *             |                                                  |
+ *             |                                                  |
+ *     0x280000|__________________________________________________|
+ *             |                                                  |
+ *             |                   Reserved5                      |  <- 64 KB
+ *     0x290000|__________________________________________________|
+ *             |                                                  |
+ *             |                                                  |
+ *             |                  Sys.Cfg/Sys.Info                |  <- 2MB
+ *             |                                                  |
+ *             |                                                  |
+ *     0x490000|__________________________________________________|
+ *             |                                                  |
+ *             |                   Reserved6                      |  <- 448 KB
+ *     0x500000|__________________________________________________|
  *             |                                                  |
  *             |                                                  |
  *             |                    GameData                      |  <- 1 MB
  *             |                                                  |
- *             |__________________________________________________|
+ *     0x600000|__________________________________________________|
  */
 
 #define TEGRABL_MB2_PARAMS_OFFSET                   0U
@@ -109,9 +124,14 @@
 								TEGRABL_CARVEOUT_PAGE_SIZE)
 #define TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD4_OFFSET  (TEGRABL_GR_OFFSET + TEGRABL_CARVEOUT_PAGE_SIZE)
 #define TEGRABL_RAMOOPS_OFFSET                      (TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD4_OFFSET + \
-                                TEGRABL_CARVEOUT_PAGE_SIZE)
-#define TEGRABL_GAMEDATA_OFFSET                     (TEGRABL_RAMOOPS_OFFSET + \
-								TEGRABL_CARVEOUT_RAMOOPS_SIZE)
+								TEGRABL_CARVEOUT_PAGE_SIZE)
+#define TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD5_OFFSET  (TEGRABL_RAMOOPS_OFFSET + TEGRABL_CARVEOUT_RAMOOPS_SIZE)
+#define TEGRABL_SYSCFG_OFFSET                       (TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD5_OFFSET + \
+								TEGRABL_CARVEOUT_PAGE_SIZE)
+#define TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD6_OFFSET  (TEGRABL_SYSCFG_OFFSET + TEGRABL_SYSCFG_SIZE)
+#define TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD6_SIZE    (448 * 1024)
+#define TEGRABL_GAMEDATA_OFFSET                     (TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD6_OFFSET + \
+								TEGRABL_CARVEOUT_CPUBL_PARAMS_RSVD6_SIZE)
 #define TEGRABL_CARVEOUT_CPUBL_PARAMS_SIZE          (TEGRABL_GAMEDATA_OFFSET + \
 								TEGRABL_CARVEOUT_GAMEDATA_SIZE)
 #endif
