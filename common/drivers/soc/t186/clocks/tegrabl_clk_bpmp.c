@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 - 2017, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2016 - 2018, NVIDIA Corporation.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -556,6 +556,20 @@ static int32_t tegrabl_module_to_bpmp_id(
 			break;
 		}
 	}
+	case TEGRABL_MODULE_VIC:
+	{
+		switch (clk_or_rst) {
+		case MOD_RST:
+			return TEGRA186_RESET_VIC;
+			break;
+		case MOD_CLK:
+			return TEGRA186_CLK_VIC;
+			break;
+		default:
+			break;
+		}
+	}
+
 	default:
 		break;
 	}

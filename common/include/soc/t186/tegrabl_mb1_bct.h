@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2015-2018, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -18,7 +18,7 @@
 #include <nvboot_sdram_param.h>
 #include <tegrabl_mb2_bct.h>
 
-#define TEGRABL_MB1BCT_VERSION				14
+#define TEGRABL_MB1BCT_VERSION				15
 #define TEGRABL_MB1BCT_AST_VERSION			2
 #define TEGRABL_MB1BCT_WDT_VERSION			1
 #define TEGRABL_MB1BCT_SW_CARVEOUT_VERSION	3
@@ -169,6 +169,7 @@ struct tegrabl_feature_fields {
 			uint64_t enable_vpr_resize:1;		/* Bits 4-4 */
 			uint64_t disable_el3_bl:1;		/* Bits 5-5 */
 			uint64_t dram_carveout_end_of_memory:1; /* Bits 6-6 */
+			uint64_t disable_staged_scrub:1;	/* Bits 7-7 */
 		};
 	};
 	union {

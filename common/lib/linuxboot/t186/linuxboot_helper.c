@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2015-2018, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -51,7 +51,8 @@
 	NV_READ32(NV_ADDRESS_MAP_SCRATCH_BASE + SCRATCH_##reg)
 
 extern struct tboot_cpubl_params *boot_params;
-static void update_bad_page(void);
+static struct tegrabl_linuxboot_memblock *update_bad_page(void);
+struct tegrabl_carveout_info *p_carveout = NULL;
 
 static int add_tegraid(char *cmdline, int len, char *param, void *priv)
 {
@@ -781,8 +782,6 @@ static struct tegrabl_linuxboot_dtnode_info extra_nodes[] = {
 
 int32_t bom_compare(const uint32_t a, const uint32_t b)
 {
-	static struct tegrabl_carveout_info *p_carveout;
-
 	p_carveout = (struct tegrabl_carveout_info *)(boot_params->global_data.carveout);
 
 	if (p_carveout[a].base < p_carveout[b].base)
@@ -840,7 +839,7 @@ static struct tegrabl_linuxboot_memblock free_block[CARVEOUT_NUM + 1];
 static struct tegrabl_linuxboot_memblock free_dram_block[CARVEOUT_NUM + NUM_DRAM_BAD_PAGES + 1];
 static uint32_t free_dram_block_count;
 
-static void update_bad_page()
+static struct tegrabl_linuxboot_memblock *update_bad_page()
 {
 	uint64_t *bad_page_arr = NULL;
 	uint64_t bad_page_count = 0;
@@ -911,21 +910,23 @@ static void update_bad_page()
 	}
 
 	free_dram_block_count = rgn;
+	return free_dram_block;
 }
 
-static void calculate_free_dram_regions(void)
+static uint32_t calculate_free_dram_regions(struct tegrabl_linuxboot_memblock
+		**free_dram_regions)
 {
 	carve_out_type_t cotype;
 	int32_t i, rgn;
 	int32_t count;
 	uint64_t cur_start, cur_end, sdram_size;
 	uint32_t perm_carveouts[CARVEOUT_NUM];
-	static struct tegrabl_carveout_info *p_carveout;
 
 	if (p_carveout != NULL) {
 		/* We calculate all free DRAM regions at once,
 		 * If called again, just return*/
-		return;
+		*free_dram_regions = free_dram_block;
+		return free_dram_block_count;
 	}
 
 	p_carveout = (struct tegrabl_carveout_info *)(boot_params->global_data.carveout);
@@ -986,8 +987,15 @@ static void calculate_free_dram_regions(void)
 		rgn++;
 	}
 	free_dram_block_count = rgn;
+	*free_dram_regions = update_bad_page();
 
-	update_bad_page();
+	return free_dram_block_count;
+}
+
+uint32_t get_free_dram_regions_info(struct tegrabl_linuxboot_memblock
+		**free_dram_regions)
+{
+	return calculate_free_dram_regions(free_dram_regions);
 }
 
 tegrabl_error_t tegrabl_linuxboot_helper_get_info(
@@ -996,6 +1004,7 @@ tegrabl_error_t tegrabl_linuxboot_helper_get_info(
 {
 	tegrabl_error_t err = TEGRABL_NO_ERROR;
 	struct tegrabl_linuxboot_memblock *memblock;
+	struct tegrabl_linuxboot_memblock *free_dram_regions = NULL;
 	uint32_t temp32;
 	uint64_t addr;
 
@@ -1088,14 +1097,14 @@ tegrabl_error_t tegrabl_linuxboot_helper_get_info(
 		temp32 = *((uint32_t *)in_data);
 		memblock = (struct tegrabl_linuxboot_memblock *)out_data;
 
-		calculate_free_dram_regions();
+		free_dram_block_count = calculate_free_dram_regions(&free_dram_regions);
 
 		if (temp32 >= free_dram_block_count) {
 			memblock->base = 0;
 			memblock->size = 0;
 		} else {
-			memblock->base = free_dram_block[temp32].base;
-			memblock->size = free_dram_block[temp32].size;
+			memblock->base = free_dram_regions[temp32].base;
+			memblock->size = free_dram_regions[temp32].size;
 		}
 
 		pr_debug("%s: memblock(%u) (base:0x%lx, size:0x%lx)\n",

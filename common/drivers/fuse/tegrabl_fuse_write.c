@@ -1130,10 +1130,15 @@ static tegrabl_error_t tegrabl_fuse_confirm_burn(enum fuse_type type,
 
 	memset(val, 0, size);
 
-	err = tegrabl_fuse_read(type, val, size);
-	if (err) {
-		pr_error("Failed to read fuse\n");
-		goto cleanup;
+	if (type == FUSE_BOOT_SECURITY_INFO) {
+		*val = tegrabl_fuse_get_security_info();
+	} else {
+		err = tegrabl_fuse_read(type, val, size);
+
+		if (err) {
+			pr_error("Failed to read fuse\n");
+			goto cleanup;
+		}
 	}
 
 	if (*val != val_written) {

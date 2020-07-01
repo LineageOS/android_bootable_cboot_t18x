@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2016-2019, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -765,15 +765,190 @@ done:
 	return error;
 }
 
+/*
+ * For REDUNDANCY BL only, there is no need to update SMD except
+ *    when boot slot is switched on this boot. For such case, we need
+ *    save the latest retry count from SR to SMD.
+ */
+static tegrabl_error_t check_non_user_redundancy_status(uint32_t reg,
+		struct slot_meta_data *smd, uint8_t *update_smd)
+{
+	tegrabl_error_t error;
+	uint8_t retry_count;
+	uint32_t smd_slot;
+	uint32_t current_slot;
+
+	*update_smd = 0;
+
+	/* Get initial retrying boot slot from SMD */
+	error = tegrabl_a_b_get_active_slot(smd, &smd_slot);
+	if (error != TEGRABL_NO_ERROR) {
+		goto done;
+	}
+
+	/* Get actual boot slot from SR */
+	current_slot = BOOT_CHAIN_REG_SLOT_NUM_GET(reg);
+
+	/* Skip updating SMD if there is no boot slot changing */
+	if (current_slot == smd_slot) {
+		goto done;
+	}
+
+	/*
+	 * Restore retry_count for REDUNDANCY BL only.
+	 * For REDUNDANCY_USER, it is UE to restore retry count when control
+	 * reaches kernel.
+	 */
+	retry_count = tegrabl_a_b_get_retry_count_reg(current_slot, reg);
+	++retry_count;
+	tegrabl_a_b_set_retry_count_reg(current_slot, retry_count);
+
+	*update_smd = 1;
+done:
+	return error;
+}
+
+static void rotate_slots_priority(struct slot_meta_data *smd,
+				uint32_t current_slot, uint8_t slot1_priority,
+				uint8_t slot2_priority)
+{
+	if (current_slot == 0) {
+		if (slot1_priority > slot2_priority) {
+			tegrabl_a_b_set_priority(smd, current_slot,
+					slot1_priority - 1);
+		} else {
+			if (slot2_priority < SLOT_PRIORITY_DEFAULT) {
+				tegrabl_a_b_set_priority(smd, !current_slot,
+						slot2_priority + 1);
+			} else {
+				/* handle maximum priority */
+				tegrabl_a_b_set_priority(smd, current_slot,
+						slot2_priority - 1);
+			}
+		}
+	} else {
+		/* current slot is 1 */
+		if (slot1_priority == (slot2_priority + 1)) {
+			/* set the gap by 2, ex curr:15, non-curr: 13 */
+			if (slot2_priority > 1) {
+				tegrabl_a_b_set_priority(smd, !current_slot,
+							slot2_priority - 1);
+			} else {
+				/* handle minimum priority */
+				tegrabl_a_b_set_priority(smd, current_slot,
+							slot1_priority + 1);
+			}
+		} else {
+			/* When the gap is already two, reverse priority */
+			tegrabl_a_b_set_priority(smd, !current_slot,
+						SLOT_PRIORITY_DEFAULT);
+			tegrabl_a_b_set_priority(smd, current_slot,
+						SLOT_PRIORITY_DEFAULT - 1);
+		}
+	}
+}
+
+static tegrabl_error_t check_user_redundancy_status(uint32_t reg,
+		struct slot_meta_data *smd, uint8_t *update_smd)
+{
+	tegrabl_error_t error;
+	uint8_t retry_count;
+	uint8_t slot1_priority, slot2_priority;
+	uint32_t current_slot;
+
+	*update_smd = 0;
+
+	/*
+	 * Restore retry_count
+	 */
+	current_slot = BOOT_CHAIN_REG_SLOT_NUM_GET(reg);
+	retry_count = tegrabl_a_b_get_retry_count_reg(current_slot, reg);
+	++retry_count;
+	tegrabl_a_b_set_retry_count_reg(current_slot, retry_count);
+	reg = tegrabl_get_boot_slot_reg();
+
+	/*
+	 * For any boot failure at this stage (u-boot or kernel), the policy
+	 * is to try up to two times on a slot by changing slot's priority.
+	 * When expired, switch slot and try again.
+	 *
+	 * Each try by either decreasing current slot's priority or increasing
+	 * the other slot's priority.
+	 *
+	 * If control reaches kernel, UE restores slots priorities.
+	 * If not, a/b logic at MB1 on next boot may switch boot slot based on
+	 * slots priorities.
+	 */
+	error = tegrabl_a_b_get_priority(smd, current_slot,
+				&slot1_priority);
+	if (error != TEGRABL_NO_ERROR) {
+		goto done;
+	}
+	error = tegrabl_a_b_get_priority(smd, !current_slot,
+				&slot2_priority);
+	if (error != TEGRABL_NO_ERROR) {
+		goto done;
+	}
+
+	/* Change priority only when both slots are bootable */
+	if (tegrabl_a_b_get_retry_count_reg(!current_slot, reg) &&
+		slot1_priority && slot2_priority) {
+		/* current slot priority must be greater or equal than
+		 * non-current slot */
+		TEGRABL_ASSERT(slot1_priority >= slot2_priority);
+
+		/*
+		 * Change slot priorities so that each boot-chain can be
+		 * tried twice before switching boot-chain if boot failed
+		 * after cboot
+		 */
+		rotate_slots_priority(smd, current_slot, slot1_priority,
+				slot2_priority);
+	}
+	*update_smd = 1;
+done:
+	return error;
+}
+
+static tegrabl_error_t check_redundancy_status(uint32_t reg,
+		struct slot_meta_data *smd, uint8_t *update_smd)
+{
+	tegrabl_error_t error;
+
+	/*
+	 * For REDUNDANCY BL only, there is no need to update SMD except
+	 *    when boot slot is switched on this boot. For such case, we need
+	 *    save the latest retry count from SR to SMD.
+	 *
+	 * For REDUNDANCY USER, ie, redundancy is supported for cboot's payload
+	 *    such as u-boot and kernel. For such case, since BL is already
+	 *    successfully booted to cboot, we should restore retry count but
+	 *    update slot priority. If control can reach UE, UE is responsible
+	 *    to restore slot priority. If control can not reach UE, boot
+	 *    failure (including device reboot) happens between cboot and UE.
+	 *    By changing slot priority values, A/B logic at mb1 can switch
+	 *    boot slot when current boot slot's priority is lower than the
+	 *    other slot.
+	 */
+	if (BOOTCTRL_SUPPORT_REDUNDANCY_USER(tegrabl_a_b_get_version(smd))
+		== 0U) {
+		/* REDUNDANCY is supported at bootloader only */
+		error = check_non_user_redundancy_status(reg, smd, update_smd);
+	} else {
+		/* REDUNDANCY is supported at kernel (or u-boot) */
+		error = check_user_redundancy_status(reg, smd, update_smd);
+	}
+
+	return error;
+}
+
 tegrabl_error_t tegrabl_a_b_update_smd(void)
 {
 	tegrabl_error_t error = TEGRABL_NO_ERROR;
 	struct slot_meta_data *smd = NULL;
 	uint32_t reg;
 	uint8_t bc_flag;
-	uint8_t retry_count;
-	uint32_t smd_slot;
-	uint32_t sr_slot;
+	uint8_t update_smd;
 
 	reg = tegrabl_get_boot_slot_reg();
 	bc_flag = BOOT_CHAIN_REG_UPDATE_FLAG_GET(reg);
@@ -787,45 +962,25 @@ tegrabl_error_t tegrabl_a_b_update_smd(void)
 
 		/*
 		 * When control reaches here, BL can claim safe.
-		 * For REDUNDANCY BL only, there is no need to update SMD except when
-		 * first time booting from redundant slot after retrying reaches max
-		 * count.
+		 *
+		 * If OTA in progress, save retry count.
+		 * or
+		 * If REDUNDANCY enabled, check redundancy status. save retry count
+		 *    based on return flag.
 		 */
 		if ((bc_flag == BC_FLAG_REDUNDANCY_BOOT) &&
-		    (BOOTCTRL_SUPPORT_REDUNDANCY(tegrabl_a_b_get_version(smd)) != 0U) &&
-			(BOOTCTRL_SUPPORT_REDUNDANCY_USER(tegrabl_a_b_get_version(smd))
-				== 0U)) {
-
-			/* Get initial retrying boot slot from SMD */
-			error = tegrabl_a_b_get_active_slot(smd, &smd_slot);
-			if (error != TEGRABL_NO_ERROR) {
+		    (BOOTCTRL_SUPPORT_REDUNDANCY(tegrabl_a_b_get_version(smd)) != 0U)) {
+			error = check_redundancy_status(reg, smd, &update_smd);
+			if ((error != TEGRABL_NO_ERROR) || (update_smd == 0U)) {
 				goto done;
 			}
-
-			/* Get actual boot slot from SR */
-			sr_slot = BOOT_CHAIN_REG_SLOT_NUM_GET(reg);
-
-			/* Skip updating SMD if there is no boot slot changing */
-			if (sr_slot == smd_slot) {
-				goto done;
-			}
-
-			/*
-			 * Restore retry_count for REDUNDANCY BL only. For REDUNDANCY_USER
-			 * it is UE responsibility to restore retry count if control can
-			 * reach UE.
-			 */
-			retry_count = tegrabl_a_b_get_retry_count_reg(sr_slot, reg);
-			++retry_count;
-			tegrabl_a_b_set_retry_count_reg(sr_slot, retry_count);
-			reg = tegrabl_get_boot_slot_reg();
 		}
 
-		/* Update SMD and flush to storage */
+		/* Update SMD based on SR and flush to storage */
+		reg = tegrabl_get_boot_slot_reg();
 		tegrabl_a_b_copy_retry_count(smd, &reg, FROM_REG_TO_SMD);
 		error = tegrabl_a_b_flush_smd(smd);
 		if (error != TEGRABL_NO_ERROR) {
-			TEGRABL_SET_HIGHEST_MODULE(error);
 			goto done;
 		}
 	}
@@ -835,6 +990,10 @@ done:
 	if (BOOT_CHAIN_REG_MAGIC_GET(reg) == BOOT_CHAIN_REG_MAGIC) {
 		reg = 0;
 		tegrabl_set_boot_slot_reg(reg);
+	}
+
+	if (error != TEGRABL_NO_ERROR) {
+		TEGRABL_SET_HIGHEST_MODULE(error);
 	}
 	return error;
 }

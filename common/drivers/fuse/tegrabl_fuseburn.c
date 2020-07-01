@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software and related documentation
@@ -56,7 +56,6 @@ static char *tegrabl_map_fusename_to_type[] = {
 	"SocSpeedo1",
 	"SocSpeedo2",
 	"EnabledCpuCores",
-	"Apb2JtagDisable",
 	"TpcDisable",
 	"Apb2JtagLock",
 	"SocIddq",
@@ -91,7 +90,6 @@ static char *tegrabl_map_fusename_to_type[] = {
 	"BootDevSelect",
 	"IgnoreBootDevStraps",
 	"BootDevInfo",
-	"SecureProvisionInfo",
 	"Kek0",
 	"Kek1",
 	"EndorsementKey",

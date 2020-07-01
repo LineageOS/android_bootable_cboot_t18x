@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2015-2018, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -20,7 +20,7 @@ extern "C"
 #include <tegrabl_compiler.h>
 #include <tegrabl_carveout_id.h>
 
-#define TEGRABL_GLOBAL_DATA_VERSION 3
+#define TEGRABL_GLOBAL_DATA_VERSION 4
 
 #define TEGRABL_MAX_VERSION_STRING 128 /* chars including null */
 
@@ -104,7 +104,10 @@ struct tegrabl_global_data {
 	/**< Parameter to unhalt SCE */
 	uint8_t enable_sce_safety;
 
-	uint8_t reserved[231];
+	/**< Parameter to enable full dram scrub at mb1 */
+	uint8_t disable_staged_scrub;
+
+	uint8_t reserved[230];
 }
 );
 
