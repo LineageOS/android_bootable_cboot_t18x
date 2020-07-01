@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2016-2019, NVIDIA Corporation.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software and related documentation
@@ -48,7 +48,14 @@ typedef uint32_t tegrabl_binary_type_t;
 #define TEGRABL_BINARY_RECOVERY_KERNEL 25U	/* 0x19 */
 #define TEGRABL_BINARY_NCT 26U		/* 0x1a */
 #define TEGRABL_BINARY_KERNEL_DTBO 27U	/* 0x1b */
+#if defined(CONFIG_ENABLE_L4T_RECOVERY)
+#define TEGRABL_BINARY_RECOVERY_IMG 28U /* 0x1c */
+#define TEGRABL_BINARY_RECOVERY_DTB 29U /* 0x1d */
+#define TEGRABL_BINARY_KERNEL_BOOTCTRL 30U      /* 0x1e */
+#define TEGRABL_BINARY_MAX 31U				/* 0x1f */
+#else
 #define TEGRABL_BINARY_MAX 28U				/* 0x1c */
+#endif
 
 /**
  * @brief Binary identifier to indicate which copy of the binary needs

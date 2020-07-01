@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2017-2019, NVIDIA CORPORATION. All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -37,6 +37,8 @@ struct tegrabl_mb2_feature_fields {
 			uint64_t disable_emmc_send_cmd0_cmd1:1;
 			/* Added in mb1bct mb2 params version 5 */
 			uint64_t dram_ecc_error_inject:1;
+			/* Added in mb1bct mb2 params version 6 */
+			uint64_t boot_from_sd:1;
 		};
 	};
 	union {
@@ -57,6 +59,17 @@ struct tegrabl_device {
 }
 );
 
+/* Added in mb1bct mb2 params version 6 */
+TEGRABL_PACKED(
+struct tegrabl_sd_params {
+	uint8_t cd_gpio;
+	uint8_t en_vdd_sd_gpio;
+	uint8_t cd_gpio_polarity;
+	uint8_t instance;
+	uint8_t reserved[12];
+}
+);
+
 /**
  * @brief Reserves some area of mb1-bct for new mb2 parameters
  * shared from mb1 to mb2. After adding member variable reduce
@@ -67,7 +80,8 @@ struct tegrabl_mb1bct_mb2_params {
 	uint32_t version;
 	struct tegrabl_mb2_feature_fields feature_fields;
 	struct tegrabl_device storage_devices[TEGRABL_MAX_STORAGE_DEVICES];
-	uint8_t reserved[1014];
+	struct tegrabl_sd_params sd_params;
+	uint8_t reserved[998];
 }
 );
 

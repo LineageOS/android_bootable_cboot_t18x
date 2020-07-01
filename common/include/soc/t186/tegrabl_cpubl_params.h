@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2015-2019, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -24,7 +24,7 @@ extern "C"
 #include <tegrabl_mb1_bct.h>
 #include <tegrabl_mb2_bct.h>
 
-#define TBOOT_CPUBL_PARAMS_VERSION 5
+#define TBOOT_CPUBL_PARAMS_VERSION 6
 
 /**
  * Consolidated structure to pass information sharing from MB2(Tboot-BPMP) to
@@ -80,7 +80,13 @@ struct tboot_cpubl_params {
 
 			struct tegrabl_device storage_devices[TEGRABL_MAX_STORAGE_DEVICES];
 
-			uint8_t reserved[214];
+			/**< SD card related params */
+			TEGRABL_DECLARE_ALIGNED(uint32_t boot_from_sd, 4);
+			TEGRABL_DECLARE_ALIGNED(uint32_t sd_instance, 4);
+			TEGRABL_DECLARE_ALIGNED(uint32_t cd_gpio, 4);
+			TEGRABL_DECLARE_ALIGNED(uint32_t cd_gpio_polarity, 4);
+
+			uint8_t reserved[198];
 		};
 	};
 }

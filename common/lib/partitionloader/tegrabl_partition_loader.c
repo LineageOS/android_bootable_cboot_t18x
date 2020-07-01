@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2015-2020, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -46,7 +46,12 @@ tegrabl_error_t tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 		[TEGRABL_BINARY_KERNEL_DTB] = {"kernel-dtb"},
 		[TEGRABL_BINARY_KERNEL_DTBO] = {"kernel-dtbo"},
 		[TEGRABL_BINARY_RECOVERY_KERNEL] = {"SOS"},
-		[TEGRABL_BINARY_NCT] = {"NCT"}
+		[TEGRABL_BINARY_NCT] = {"NCT"},
+#if defined(CONFIG_ENABLE_L4T_RECOVERY)
+		[TEGRABL_BINARY_RECOVERY_IMG] = {"recovery"},
+		[TEGRABL_BINARY_RECOVERY_DTB] = {"recovery-dtb"},
+		[TEGRABL_BINARY_KERNEL_BOOTCTRL] = {"kernel-bootctrl"}
+#endif
 	};
 
 	TEGRABL_ASSERT(strlen(partition_names[bin_type]) <=
@@ -169,12 +174,22 @@ static tegrabl_error_t tegrabl_get_binary_info(
 		break;
 
 	case TEGRABL_BINARY_KERNEL_DTB:
+#if defined(CONFIG_ENABLE_L4T_RECOVERY)
+	case TEGRABL_BINARY_RECOVERY_DTB:
+#endif
 		binary->load_address = (void *)tegrabl_get_dtb_load_addr();
 		break;
 
 	case TEGRABL_BINARY_NCT:
 		err = tegrabl_get_nct_load_addr(&binary->load_address);
 		break;
+
+#if defined(CONFIG_ENABLE_L4T_RECOVERY)
+	case TEGRABL_BINARY_RECOVERY_IMG:
+	case TEGRABL_BINARY_KERNEL_BOOTCTRL:
+		err = tegrabl_get_recovery_img_load_addr(&binary->load_address);
+		break;
+#endif
 
 	default:
 		pr_error("Invalid bin type\n");
@@ -382,6 +397,8 @@ tegrabl_error_t tegrabl_load_binary_copy(
 		goto done;
 	}
 
+	pr_info("Loading %s from partition\n", binary.partition_name);
+
 	/* if partition has no fixed predefined load address, callers should
 	 * provide valid load address and available load size in advance
 	 */
@@ -423,7 +440,12 @@ tegrabl_error_t tegrabl_load_binary_copy(
 	}
 
 	/* Read the partition from storage */
+#if defined(CONFIG_ENABLE_L4T_RECOVERY)
+	if (bin_type == TEGRABL_BINARY_KERNEL
+		|| bin_type == TEGRABL_BINARY_RECOVERY_IMG)
+#else
 	if (bin_type == TEGRABL_BINARY_KERNEL)
+#endif
 		err = read_kernel_partition(&partition, binary.load_address,
 									&partition_size);
 	else

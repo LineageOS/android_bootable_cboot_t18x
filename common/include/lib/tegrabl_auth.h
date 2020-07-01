@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All Rights Reserved.
+ * Copyright (c) 2016-2019, NVIDIA CORPORATION.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -16,6 +16,9 @@
 #include <tegrabl_error.h>
 #include <tegrabl_sigheader.h>
 #include <tegrabl_crypto.h>
+#if defined(CONFIG_ENABLE_SECURE_BOOT)
+#include <tegrabl_binary_types.h>
+#endif
 
 #define TEGRABL_AUTH_MAX_HEADERS 2
 
@@ -204,10 +207,11 @@ tegrabl_error_t tegrabl_cipher_binary(void *buffer,
 	uint32_t buffer_size, void *output_buffer, bool is_decrypt);
 
 
-#if defined(CONFIG_OS_IS_L4T)
-#include <tegrabl_binary_types.h>
+#if defined(CONFIG_ENABLE_SECURE_BOOT)
 tegrabl_error_t tegrabl_auth_payload(tegrabl_binary_type_t bin_type,
 			char *name, void *payload, uint32_t max_size);
+
+uint32_t tegrabl_sigheader_size(void);
 #endif
 
 #endif /* TEGRABL_AUTH_H */
