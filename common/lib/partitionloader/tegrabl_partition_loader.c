@@ -68,7 +68,7 @@ tegrabl_error_t tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 	 * Note: Needs to map from binary_copy to boot slot number
 	 *       once they are no longer identical matching
 	 */
-	tegrabl_a_b_set_bootslot_suffix(binary_copy, partition_name, false);
+	tegrabl_a_b_set_bootslot_suffix(binary_copy, partition_name, true);
 
 #else
 	if (binary_copy == TEGRABL_BINARY_COPY_RECOVERY) {
