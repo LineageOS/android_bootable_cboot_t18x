@@ -252,7 +252,7 @@ static int add_boot_slot_suffix(char *cmdline, int len, char *param, void *priv)
 		return TEGRABL_ERROR(TEGRABL_ERR_INVALID, 0);
 	}
 
-	status = tegrabl_a_b_get_bootslot_suffix(slot_suffix, false);
+	status = tegrabl_a_b_get_bootslot_suffix(slot_suffix, true);
 	if (status != TEGRABL_NO_ERROR) {
 		return TEGRABL_ERROR(TEGRABL_ERR_INVALID, 1);
 	}
