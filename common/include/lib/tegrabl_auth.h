@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2019, NVIDIA CORPORATION.  All Rights Reserved.
+ * Copyright (c) 2016-2020, NVIDIA CORPORATION.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -212,6 +212,10 @@ tegrabl_error_t tegrabl_auth_payload(tegrabl_binary_type_t bin_type,
 			char *name, void *payload, uint32_t max_size);
 
 uint32_t tegrabl_sigheader_size(void);
+
+uint32_t tegrabl_auth_get_binary_len(void *bin_load_addr);
+
+tegrabl_error_t tegrabl_auth_complete(void);
 #endif
 
 #endif /* TEGRABL_AUTH_H */

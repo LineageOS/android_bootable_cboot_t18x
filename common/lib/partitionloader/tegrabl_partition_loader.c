@@ -86,6 +86,8 @@ static tegrabl_error_t a_b_get_bin_copy(tegrabl_binary_type_t bin_type,
 {
 	tegrabl_error_t err = TEGRABL_NO_ERROR;
 	uint32_t slot;
+	uint8_t rootfs_id;
+	uint32_t version;
 	struct slot_meta_data *smd = NULL;
 
 	/* Do A/B selection for bin_type that have a/b slots */
@@ -118,6 +120,25 @@ static tegrabl_error_t a_b_get_bin_copy(tegrabl_binary_type_t bin_type,
 		}
 	}
 
+	/*
+	 * Handle rootfs A/B is enabled,
+	 * kernel and kernel-dtb should be loaded per rootfs_id.
+	 */
+	err = tegrabl_a_b_get_current_rootfs_id(NULL, &rootfs_id);
+	if (err == TEGRABL_NO_ERROR) {
+		/* Load kernel/kernel-dtb per rootfs id */
+		if ((rootfs_id == ROOTFS_A) || (rootfs_id == ROOTFS_B)) {
+			slot = (uint32_t)rootfs_id;
+		} else {
+			/* rootfs AB are both unbootable */
+			err = TEGRABL_ERROR(TEGRABL_ERR_INVALID, 0);
+			goto done;
+		}
+	} else {
+		/* Not rootfs AB, restore err */
+		err = TEGRABL_NO_ERROR;
+	}
+
 	*binary_copy = (tegrabl_binary_copy_t)slot;
 	if (slot == BOOT_SLOT_A) {
 		goto done;
@@ -141,9 +162,10 @@ static tegrabl_error_t a_b_get_bin_copy(tegrabl_binary_type_t bin_type,
 		goto done;
 	}
 
-	if ((BOOTCTRL_SUPPORT_REDUNDANCY(tegrabl_a_b_get_version(smd)) != 0U) &&
-		(BOOTCTRL_SUPPORT_REDUNDANCY_USER(tegrabl_a_b_get_version(smd)) ==
-			0U)) {
+	version = tegrabl_a_b_get_version(smd);
+	if ((BOOTCTRL_SUPPORT_REDUNDANCY(version) != 0U) &&
+	    (BOOTCTRL_SUPPORT_REDUNDANCY_USER(version) == 0U) &&
+	    (BOOTCTRL_SUPPORT_ROOTFS_AB(version) == 0U)) {
 		*binary_copy = TEGRABL_BINARY_COPY_PRIMARY;
 		slot = BOOT_SLOT_A;
 		goto done;
