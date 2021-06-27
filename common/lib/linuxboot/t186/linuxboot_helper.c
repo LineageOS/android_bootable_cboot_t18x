@@ -356,9 +356,9 @@ static int add_boot_recovery_info(char *cmdline, int len, char *param,
 
 	bin_type = tegrabl_get_kernel_type();
 	if (bin_type != TEGRABL_BINARY_RECOVERY_KERNEL) {
-		ret = tegrabl_snprintf(cmdline, len, "%s init=/init ", param);
+		ret = tegrabl_snprintf(cmdline, len, "%s init=/init rootdelay=1 ", param);
 	} else {
-		ret = tegrabl_snprintf(cmdline, len, "init=/init ");
+		ret = tegrabl_snprintf(cmdline, len, "init=/init rootdelay=1 ");
 	}
 
 done:
