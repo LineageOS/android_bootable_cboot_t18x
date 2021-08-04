@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017, NVIDIA Corporation.  All rights reserved.
+ * Copyright (c) 2015-2020, NVIDIA Corporation.  All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property
  * and proprietary rights in and to this software, related documentation
@@ -85,7 +85,7 @@ extern uint32_t g_pllrefdiv;
 #define TEGRABL_CLK_MIN_CNT_48 TEGRABL_CLK_MIN_RANGE(48000000)
 #define TEGRABL_CLK_MAX_CNT_48 TEGRABL_CLK_MAX_RANGE(48000000)
 
-uint32_t tegrabl_get_pllref_khz(void);
+tegrabl_error_t tegrabl_get_pllref_khz(uint32_t *freq);
 
 tegrabl_error_t tegrabl_enable_mem_clk(
 		bool enable, void *priv_data);
@@ -124,7 +124,9 @@ tegrabl_error_t tegrabl_clk_start_pll(
 
 tegrabl_error_t tegrabl_sata_pll_cfg(void);
 
-uint32_t tegrabl_get_pll_freq_khz(tegrabl_clk_pll_id_t pll_id);
+tegrabl_error_t tegrabl_get_pll_freq_khz(
+		tegrabl_clk_pll_id_t pll_id,
+		uint32_t *freq);
 
 bool check_clk_src_enable(tegrabl_clk_src_id_t clk_src);
 
