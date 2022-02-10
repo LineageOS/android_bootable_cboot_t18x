@@ -42,10 +42,10 @@ tegrabl_error_t tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 	tegrabl_error_t err = TEGRABL_NO_ERROR;
 	static char partition_names[TEGRABL_BINARY_MAX]
 								[TEGRABL_GPT_MAX_PARTITION_NAME + 1] = {
-		[TEGRABL_BINARY_KERNEL] = {"kernel"},
+		[TEGRABL_BINARY_KERNEL] = {"boot"},
 		[TEGRABL_BINARY_KERNEL_DTB] = {"kernel-dtb"},
 		[TEGRABL_BINARY_KERNEL_DTBO] = {"kernel-dtbo"},
-		[TEGRABL_BINARY_RECOVERY_KERNEL] = {"SOS"},
+		[TEGRABL_BINARY_RECOVERY_KERNEL] = {"recovery"},
 		[TEGRABL_BINARY_NCT] = {"NCT"},
 #if defined(CONFIG_ENABLE_L4T_RECOVERY)
 		[TEGRABL_BINARY_RECOVERY_IMG] = {"recovery"},
