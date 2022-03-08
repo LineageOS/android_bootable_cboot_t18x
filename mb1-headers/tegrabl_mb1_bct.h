@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2015-2022, NVIDIA CORPORATION. All rights reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -170,6 +170,8 @@ struct tegrabl_feature_fields {
 			uint64_t dram_carveout_end_of_memory:1; /* Bits 6-6 */
 			uint64_t disable_staged_scrub:1;	/* Bits 7-7 */
 			uint64_t skip_sdram_init:1; 	/* Bits 8-8 */
+			uint64_t diag_boot_mode:1; 		/* Bits 9-9 */
+			uint64_t sor_assr_force_internal:2;	/* Bits 10-11 */
 		};
 	};
 	union {
