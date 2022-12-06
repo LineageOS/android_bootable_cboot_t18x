@@ -380,6 +380,8 @@ struct rb_limits {
 	uint8_t tsec_gsc_ucode;
 	uint8_t early_spe_fw;
 	uint8_t extended_spe_fw;
+	uint8_t hdcp2srm;
+	uint8_t cpubl;
 }
 );
 TEGRABL_PACKED(
@@ -389,7 +391,7 @@ struct tegrabl_mb1bct_rollback {
 	uint8_t fuse_idx;
 	uint8_t level;
 	struct rb_limits limits;
-	uint8_t reserved[51];
+	uint8_t reserved[49];
 }
 );
 
