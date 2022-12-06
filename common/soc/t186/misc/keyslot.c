@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2016-2022, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -85,10 +85,10 @@ bool tegrabl_keyslot_check_if_key_is_nonzero(uint8_t keyslot)
 	}
 fail:
 	if (input_data != NULL) {
-		tegrabl_free(input_data);
+		tegrabl_dealloc(TEGRABL_HEAP_DMA, input_data);
 	}
 	if (input_iv != NULL) {
-		tegrabl_free(input_iv);
+		tegrabl_dealloc(TEGRABL_HEAP_DMA, input_iv);
 	}
 
 	return fuse_status;

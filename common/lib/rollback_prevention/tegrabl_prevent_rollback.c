@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2020, NVIDIA Corporation.  All Rights Reserved.
+ * Copyright (c) 2017-2022, NVIDIA Corporation.  All Rights Reserved.
  *
  * NVIDIA Corporation and its licensors retain all intellectual property and
  * proprietary rights in and to this software and related documentation.  Any
@@ -54,6 +54,49 @@ uint32_t tegrabl_rollback_level_to_fusevalue(uint8_t fuse_level)
 
 tegrabl_error_t tegrabl_init_rollback_data(struct tegrabl_rollback *rb)
 {
+#ifdef CONFIG_ENFORCE_ROLLBACK_ENBALED
+	uint32_t rollback_fuse_value;
+
+	if (rb == NULL) {
+		pr_error("rollback data is NULL, probably using older MB1\n");
+		return TEGRABL_ERROR(TEGRABL_ERR_INVALID, 0);
+	}
+
+	pr_debug("rb->version                %u\n", rb->version);
+	pr_debug("rb->enabled                %u\n", rb->enabled);
+	pr_debug("rb->fuse_idx               %u\n", rb->fuse_idx);
+	pr_debug("rb->level                  %u\n", rb->level);
+	pr_debug("rb->limits.boot            %u\n", rb->limits.boot);
+	pr_debug("rb->limits.bpmp_fw         %u\n", rb->limits.bpmp_fw);
+	pr_debug("rb->limits.tos             %u\n", rb->limits.tos);
+	pr_debug("rb->limits.tsec            %u\n", rb->limits.tsec);
+	pr_debug("rb->limits.nvdec           %u\n", rb->limits.nvdec);
+	pr_debug("rb->limits.srm             %u\n", rb->limits.srm);
+	pr_debug("rb->limits.tsec_gsc_ucode  %u\n", rb->limits.tsec_gsc_ucode);
+	pr_debug("rb->limits.hdcp2srm        %u\n", rb->limits.hdcp2srm);
+	pr_debug("rb->limits.cpubl           %u\n", rb->limits.cpubl);
+
+	if (rb->version != 3) {
+		pr_error("RB version is not 3\n");
+		return TEGRABL_ERROR(TEGRABL_ERR_INVALID, 0);
+	}
+
+	if (rb->enabled == 0) {
+		if (!fuse_is_nv_production_mode()) {
+			/* MB1 marks rb->enabled = 0 for internal devices,
+			 * but make it 1 again so that TSEC firmware can run */
+			pr_info("Making rb->enabled=1 for internal devices\n");
+			rb->enabled = 1;
+		} else {
+			pr_error("Rollback not enabled\n");
+			return TEGRABL_ERROR(TEGRABL_ERR_INVALID, 0);
+		}
+	}
+	/* Set register RSV56 to rollback fuse level and fuse index for QB */
+	rollback_fuse_value = tegrabl_rollback_level_to_fusevalue(rb->level);
+	SCRATCH_WRITE(SECURE_RSV56_SCRATCH_0, rollback_fuse_value);
+	SCRATCH_WRITE(SECURE_RSV56_SCRATCH_1, rb->fuse_idx);
+#endif
 	rb_data = rb;
 	return TEGRABL_NO_ERROR;
 }
@@ -88,8 +131,8 @@ tegrabl_error_t tegrabl_check_binary_rollback(uint32_t bin_type,
 		break;
 	case TEGRABL_BINARY_CPU_BL:
 		bin_name = "Cpu-bl";
-		if (rollback_level < rb->limits.boot) {
-			expected_level = rb->limits.boot;
+		if (rollback_level < rb->limits.cpubl) {
+			expected_level = rb->limits.cpubl;
 			goto fail;
 		}
 		break;
