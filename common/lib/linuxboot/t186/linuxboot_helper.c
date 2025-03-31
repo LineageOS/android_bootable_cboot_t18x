@@ -59,7 +59,7 @@
 #define MEM_ALIGN_MASK(x)			(~((x) - 1))
 #define MEM_ALIGN(x, y)				(((uint64_t)(x) + (y) - 1) & MEM_ALIGN_MASK(y))
 #define HEADERS_TOTAL_SIZE			(sizeof(struct tegrabl_sigheader) + \
-							sizeof(union tegrabl_bootimg_header) + \
+							sizeof(tegrabl_bootimg_header) + \
 							sizeof(struct tegrabl_uboot_header))
 /* U-Boot restricts itself to 4GB address space so that it can support platforms that cannot work
  * with addresses larger than 32bits.
@@ -1465,7 +1465,7 @@ tegrabl_error_t tegrabl_get_boot_img_load_addr(void **load_addr)
 	char partition_name[TEGRABL_GPT_MAX_PARTITION_NAME + 1];
 	struct tegrabl_partition partition;
 	uint8_t *ptr;
-	union tegrabl_bootimg_header *bootimg_header = NULL;
+	tegrabl_bootimg_header *bootimg_header = NULL;
 
 	err = tegrabl_get_partition_name(TEGRABL_BINARY_KERNEL, 0, partition_name);
 	if (err != TEGRABL_NO_ERROR) {
@@ -1502,7 +1502,7 @@ tegrabl_error_t tegrabl_get_boot_img_load_addr(void **load_addr)
 		 * For kernel only case or uboot only case, the ramdisk
 		 * size is 0
 		 */
-		bootimg_header = (union tegrabl_bootimg_header *)ptr;
+		bootimg_header = (tegrabl_bootimg_header *)ptr;
 		bootimg_size += bootimg_header->kernelsize;
 		bootimg_size += bootimg_header->ramdisksize;
 		pr_info("Boot image size read from image header: %lx\n", bootimg_size);
