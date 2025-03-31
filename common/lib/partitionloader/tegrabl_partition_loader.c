@@ -233,6 +233,7 @@ static tegrabl_error_t read_kernel_partition(
 	uint32_t remain_size;
 	tegrabl_bootimg_header *hdr;
 	uint32_t device_type;
+	struct boot_img_hdr_v3* hdr_v3 = NULL;
 
 	pr_trace("%s(): %u\n", __func__, __LINE__);
 
@@ -248,10 +249,17 @@ static tegrabl_error_t read_kernel_partition(
 	if (!strncmp((char *)hdr->magic, BOOT_MAGIC, BOOT_MAGIC_SIZE)) {
 		/* for android kernel, read remaining kernel size */
 		/* align kernel/ramdisk/secondimage/signature size with page size */
-		remain_size = ALIGN(hdr->kernel_size, hdr->page_size);
-		remain_size += ALIGN(hdr->ramdisk_size, hdr->page_size);
-		remain_size += ALIGN(hdr->second_size, hdr->page_size);
-		remain_size += ALIGN(BOOT_IMG_SIG_SIZE, hdr->page_size);
+		if (hdr->header_version >= 3) {
+			hdr_v3 = (struct boot_img_hdr_v3*)hdr;
+			remain_size = ALIGN(hdr_v3->kernel_size, 4096);
+			remain_size += ALIGN(hdr_v3->ramdisk_size, 4096);
+			remain_size += ALIGN(BOOT_IMG_SIG_SIZE, 4096);
+		} else {
+			remain_size = ALIGN(hdr->kernel_size, hdr->page_size);
+			remain_size += ALIGN(hdr->ramdisk_size, hdr->page_size);
+			remain_size += ALIGN(hdr->second_size, hdr->page_size);
+			remain_size += ALIGN(BOOT_IMG_SIG_SIZE, hdr->page_size);
+		}
 		pr_trace("%u: kernel partition: read size (excluding header): 0x%08x\n", __LINE__, remain_size);
 
 		if (remain_size + ANDROID_HEADER_SIZE > *partition_size) {
@@ -261,7 +269,7 @@ static tegrabl_error_t read_kernel_partition(
 			 * than boot.img size
 			 */
 			pr_error("kernel partition size should be at least %dB larger than \
-					 kernel size\n", 4 * hdr->page_size);
+					 kernel size\n", 4 * (hdr->header_version >= 3 ? 4096 : hdr->page_size));
 			err = TEGRABL_ERROR(TEGRABL_ERR_INVALID, 0);
 			return err;
 		}
