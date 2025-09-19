@@ -47,6 +47,7 @@ tegrabl_error_t tegrabl_get_partition_name(tegrabl_binary_type_t bin_type,
 		[TEGRABL_BINARY_KERNEL_DTBO] = {"kernel-dtbo"},
 		[TEGRABL_BINARY_RECOVERY_KERNEL] = {"recovery"},
 		[TEGRABL_BINARY_NCT] = {"NCT"},
+		[TEGRABL_BINARY_VENDOR_KERNEL] = {"vendor_boot"},
 #if defined(CONFIG_ENABLE_L4T_RECOVERY)
 		[TEGRABL_BINARY_RECOVERY_IMG] = {"recovery"},
 		[TEGRABL_BINARY_RECOVERY_DTB] = {"recovery-dtb"},
@@ -95,6 +96,7 @@ static tegrabl_error_t a_b_get_bin_copy(tegrabl_binary_type_t bin_type,
 	case TEGRABL_BINARY_KERNEL:
 	case TEGRABL_BINARY_KERNEL_DTB:
 	case TEGRABL_BINARY_KERNEL_DTBO:
+	case TEGRABL_BINARY_VENDOR_KERNEL:
 		/* TODO: add a bin_type that supports a/b */
 		break;
 
@@ -193,6 +195,10 @@ static tegrabl_error_t tegrabl_get_binary_info(
 	case TEGRABL_BINARY_KERNEL:
 	case TEGRABL_BINARY_RECOVERY_KERNEL:
 		err = tegrabl_get_boot_img_load_addr(&binary->load_address);
+		break;
+
+	case TEGRABL_BINARY_VENDOR_KERNEL:
+		err = tegrabl_get_vendor_boot_img_load_addr(&binary->load_address);
 		break;
 
 	case TEGRABL_BINARY_KERNEL_DTB:

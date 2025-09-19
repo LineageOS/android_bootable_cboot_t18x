@@ -1560,6 +1560,12 @@ tegrabl_error_t tegrabl_get_boot_img_load_addr(void **load_addr)
 	return TEGRABL_NO_ERROR;
 }
 
+tegrabl_error_t tegrabl_get_vendor_boot_image_load_addr(void **load_addr)
+{
+	*load_addr = (void *)VENDOR_BOOT_IMAGE_LOAD_ADDRESS;
+	return TEGRABL_NO_ERROR;
+}
+
 uint64_t tegrabl_get_kernel_load_addr(void)
 {
 	return LINUX_LOAD_ADDRESS;
