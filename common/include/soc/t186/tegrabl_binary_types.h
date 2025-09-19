@@ -48,15 +48,16 @@ typedef uint32_t tegrabl_binary_type_t;
 #define TEGRABL_BINARY_RECOVERY_KERNEL 25U	/* 0x19 */
 #define TEGRABL_BINARY_NCT 26U		/* 0x1a */
 #define TEGRABL_BINARY_KERNEL_DTBO 27U	/* 0x1b */
+#define TEGRABL_BINARY_VENDOR_KERNEL 28U	/* 0x1c */
 #if defined(CONFIG_ENABLE_L4T_RECOVERY)
-#define TEGRABL_BINARY_RECOVERY_IMG 28U /* 0x1c */
-#define TEGRABL_BINARY_RECOVERY_DTB 29U /* 0x1d */
-#define TEGRABL_BINARY_KERNEL_BOOTCTRL 30U      /* 0x1e */
-#define TEGRABL_BINARY_INVALID 31U				/* 0x1f */
-#define TEGRABL_BINARY_MAX 32U					/* 0x20 */
+#define TEGRABL_BINARY_RECOVERY_IMG 29U /* 0x1d */
+#define TEGRABL_BINARY_RECOVERY_DTB 30U /* 0x1e */
+#define TEGRABL_BINARY_KERNEL_BOOTCTRL 31U      /* 0x1f */
+#define TEGRABL_BINARY_INVALID 32U				/* 0x20 */
+#define TEGRABL_BINARY_MAX 33U					/* 0x21 */
 #else
-#define TEGRABL_BINARY_INVALID 28U			/* 0x1c */
-#define TEGRABL_BINARY_MAX 29U				/* 0x1d */
+#define TEGRABL_BINARY_INVALID 29U			/* 0x1d */
+#define TEGRABL_BINARY_MAX 30U				/* 0x1e */
 #endif
 
 /**
